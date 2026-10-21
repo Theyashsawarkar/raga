@@ -2,6 +2,13 @@
 
 Newest first. Releases are tags (`vX.Y.Z`).
 
+## v0.1.2 -- 2026-10-21
+
+- Music plays in nāda (the music player) when it's installed: it streams the
+  song, lines up YouTube's mix after it, shows the lyrics and can download
+  it. Without nāda, music still goes into MPD through rmpc. New setting
+  `nada_command` (default `nada`; empty uses rmpc).
+
 ## v0.1.1 -- 2026-10-21
 
 - Documentation for open source: a logo and banner, a full README (features,

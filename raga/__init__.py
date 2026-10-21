@@ -1,10 +1,12 @@
 """raga (राग, "melody"): YouTube music and video for Vyom.
 
 Search as you type (yt-dlp, no Invidious), with thumbnails, durations
-and channels. Music goes into MPD's queue through rmpc and plays at once;
-a video opens in mpv (capped at 1080p, which this machine decodes
-smoothly). Which entry plays is taken from the queue itself, before and
-after adding: `rmpc addyt` exits 0 even when its download failed.
+and channels. Music plays in nāda (the music player: it streams the song,
+lines up what comes next, shows the lyrics, and can download it) or,
+without nāda, goes into MPD's queue through rmpc. A video opens in mpv
+(capped at 1080p). With rmpc, which entry plays is taken from the queue
+itself, before and after adding: `rmpc addyt` exits 0 even when its
+download failed.
 """
 import concurrent.futures
 import json
@@ -16,7 +18,7 @@ from gi.repository import Gtk
 from vyom import Hint, Row, Section, ui, util
 from vyom import Plugin as Base
 
-# keybind: Vyom/music | Enter | Play the selected result (music: in MPD via rmpc; video: in mpv)
+# keybind: Vyom/music | Enter | Play the selected result (music: in nāda, or MPD via rmpc; video: in mpv)
 # keybind: Vyom/music | Shift+Enter | Play it the other way (as video / as music)
 # keybind: Vyom/music | Ctrl+Enter | Add the music to the queue without playing it
 # keybind: Vyom/music | Ctrl+M | Switch between music and video
@@ -154,8 +156,9 @@ class Plugin(Base):
             util.notify("YouTube video", f"Playing: {title}", icon="video-x-generic", app="raga")
             util.spawn(["mpv", "--no-terminal", "--force-window=yes", f"--ytdl-format={VIDEO_FORMAT}", url])
             return
-        util.notify("YouTube music", f"{'Queueing' if queue_only else 'Adding'}: {title}", icon="audio-x-generic",
-                    app="raga")
+        if not util.have(self.conf.get("nada_command", "nada")):   # nāda says what it plays itself
+            util.notify("YouTube music", f"{'Queueing' if queue_only else 'Adding'}: {title}", icon="audio-x-generic",
+                        app="raga")
         import threading
         threading.Thread(target=self.play_music, args=(url, title, queue_only), daemon=True).start()
 
@@ -167,8 +170,17 @@ class Plugin(Base):
             return {}
 
     def play_music(self, url, title, queue_only):
+        nada = self.conf.get("nada_command", "nada")
+        if nada and util.have(nada):
+            # nāda resolves the stream, plays it and lines up what comes next
+            code, out, err = util.run_full([nada, "add", "--next" if queue_only else "--play", url], timeout=30)
+            if code != 0:
+                util.notify("YouTube music failed", (err.strip().splitlines() or ["nāda didn't answer"])[-1][:200],
+                            urgency="critical", app="raga")
+            return
         if not util.have("rmpc"):
-            util.notify("YouTube music", "needs rmpc (MPD client) to queue music", urgency="critical", app="raga")
+            util.notify("YouTube music", "needs nāda (the music player) or rmpc to play music", urgency="critical",
+                        app="raga")
             return
         before = self.queue_files()
         code, out, err = util.run_full(["rmpc", "addyt", "--position", "0", url], timeout=90)

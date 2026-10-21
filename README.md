@@ -40,9 +40,9 @@ raga is youTube music and video for [Vyom](https://github.com/Theyashsawarkar/vy
 ## Features
 
 - **Search as you type** (yt-dlp, no Invidious), with thumbnails, durations, channels and views.
-- Music goes **into MPD's queue through rmpc and plays at once**; video opens in **mpv**, capped at 1080p.
+- Music **plays in [nāda](https://github.com/Theyashsawarkar/nada)** (the music player: it lines up what comes next, shows the lyrics, `D` downloads it), or without nāda goes into MPD's queue through rmpc; video opens in **mpv**, capped at 1080p.
 - `Shift+Enter` plays the other way; `Ctrl+Enter` only queues the music.
-- Which queue entry plays is read from the queue itself, before and after adding: `rmpc addyt` exits 0 even when its download failed.
+- With rmpc, which queue entry plays is read from the queue itself, before and after adding: `rmpc addyt` exits 0 even when its download failed.
 - Keyboard first: every action has a key, shown in the footer; the mouse works too.
 - Never freezes the panel: slow commands run in the background.
 
@@ -52,7 +52,7 @@ raga is youTube music and video for [Vyom](https://github.com/Theyashsawarkar/vy
 
 - [Vyom](https://github.com/Theyashsawarkar/vyom) 0.2.5 or newer (Python 3.11+, PyGObject, GTK 4, [gtk4-layer-shell](https://github.com/wmww/gtk4-layer-shell), a Nerd Font)
 - `yt-dlp`
-- optional: rmpc + MPD (music)
+- optional: nāda, or rmpc + MPD (music)
 - optional: mpv (video)
 
 ### Install
@@ -82,7 +82,7 @@ Open it with `vyom raga` (or your key). Type to search; the footer always shows 
 
 | Key | Action |
 |---|---|
-| `Enter` | Play the selected result (music: in MPD via rmpc; video: in mpv) |
+| `Enter` | Play the selected result (music: in nāda, or MPD via rmpc; video: in mpv) |
 | `Shift+Enter` | Play it the other way (as video / as music) |
 | `Ctrl+Enter` | Add the music to the queue without playing it |
 | `Ctrl+M` | Switch between music and video |
@@ -97,7 +97,8 @@ Everything is optional, in `~/.config/vyom/config.toml` under `[plugin.raga]`:
 | Setting | Default | What it does |
 |---|---|---|
 | `mode` | music | Music or video to start in |
-| `player_command` | (none) | Opened after music starts (e.g. your rmpc launcher) |
+| `nada_command` | nada | The music player music goes to (empty: use rmpc) |
+| `player_command` | (none) | With rmpc: opened after music starts (e.g. your rmpc launcher) |
 
 Run `vyom reload` after editing.
 
