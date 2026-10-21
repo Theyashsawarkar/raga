@@ -2,6 +2,12 @@
 
 Newest first. Releases are tags (`vX.Y.Z`).
 
+## v0.1.3 -- 2026-10-21
+
+- A website (GitHub Pages, https://theyashsawarkar.github.io/raga/): the README as a home page, the
+  changelog, and architecture decision records (`docs/adr/`), built from these files by
+  `scripts/build-site.py`; CI checks the site is up to date.
+
 ## v0.1.2 -- 2026-10-21
 
 - Music plays in nāda (the music player) when it's installed: it streams the

@@ -1,0 +1,8 @@
+# The project website (docs/, GitHub Pages): built by scripts/build-site.py
+name = "raga"
+sanskrit = "राग"
+meaning = "melody"
+tagline = "Search YouTube and play: music straight into MPD's queue (rmpc), or a video in mpv. Thumbnails, durations, channels."
+color = "pink"
+kind = "a Vyom tool"
+logo = "assets/logo.svg"
