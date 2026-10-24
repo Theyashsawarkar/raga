@@ -1,7 +1,7 @@
 name = "raga"
 title = "Music & video"
 description = "Search YouTube and play: music straight into MPD's queue (rmpc), or a video in mpv. Thumbnails, durations, channels."
-version = "0.2.0"
+version = "0.2.1"
 vyom = "0.3.0"
 icon = "󰝚"
 color = "pink"

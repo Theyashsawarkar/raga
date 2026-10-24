@@ -2,6 +2,12 @@
 
 Newest first. Releases are tags (`vX.Y.Z`).
 
+## v0.2.1 -- 2026-10-24
+
+- A thumbnail that can't be fetched is logged (debug), not swallowed.
+- Logs are in the journal (Vyom 0.3.2): the README, CONTRIBUTING and the bug
+  report form say `journalctl --user -u vyom -u vyom-daemon -b`.
+
 ## v0.2.0 -- 2026-10-24
 
 - The Music / Video tabs switch like every Vyom tool's tabs (Vyom 0.3.0): `Ctrl+H` /

@@ -10,6 +10,7 @@ download failed.
 """
 import concurrent.futures
 import json
+import logging
 import os
 import urllib.request
 
@@ -24,6 +25,8 @@ VIDEO_FORMAT = "bestvideo[height<=1080]+bestaudio/best[height<=1080]"
 os.environ.setdefault("MPD_HOST", os.path.join(os.environ.get("XDG_RUNTIME_DIR", f"/run/user/{os.getuid()}"),
                                                "mpd/socket"))
 THUMBS = os.path.join(util.CACHE, "raga")
+
+log = logging.getLogger("vyom.raga")
 
 
 def duration(s):
@@ -54,7 +57,8 @@ def thumb(vid):
         with open(path, "wb") as f:
             f.write(data)
         return path
-    except Exception:
+    except Exception as e:   # offline, or no thumbnail: the row just has none
+        log.debug("thumbnail for %s: %s", vid, e)
         return None
 
 
@@ -93,7 +97,7 @@ class Plugin(Base):
                 except ValueError:
                     pass
             with concurrent.futures.ThreadPoolExecutor(8) as ex:
-                for d, path in zip(res, ex.map(lambda d: thumb(d.get("id", "")), res)):
+                for d, path in zip(res, ex.map(lambda d: thumb(d.get("id", "")), res), strict=False):
                     d["_thumb"] = path
             self.cache[q] = res
             if len(self.cache) > 30:
