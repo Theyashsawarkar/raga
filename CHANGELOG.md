@@ -2,6 +2,11 @@
 
 Newest first. Releases are tags (`vX.Y.Z`).
 
+## v0.2.0 -- 2026-10-24
+
+- The Music / Video tabs switch like every Vyom tool's tabs (Vyom 0.3.0): `Ctrl+H` /
+  `Ctrl+L` or `Ctrl+1` / `Ctrl+2`, instead of `Ctrl+M`. Needs Vyom 0.3.0.
+
 ## v0.1.3 -- 2026-10-21
 
 - A website (GitHub Pages, https://theyashsawarkar.github.io/raga/): the README as a home page, the

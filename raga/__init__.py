@@ -13,15 +13,12 @@ import json
 import os
 import urllib.request
 
-from gi.repository import Gtk
-
 from vyom import Hint, Row, Section, ui, util
 from vyom import Plugin as Base
 
 # keybind: Vyom/music | Enter | Play the selected result (music: in nāda, or MPD via rmpc; video: in mpv)
 # keybind: Vyom/music | Shift+Enter | Play it the other way (as video / as music)
 # keybind: Vyom/music | Ctrl+Enter | Add the music to the queue without playing it
-# keybind: Vyom/music | Ctrl+M | Switch between music and video
 
 VIDEO_FORMAT = "bestvideo[height<=1080]+bestaudio/best[height<=1080]"
 os.environ.setdefault("MPD_HOST", os.path.join(os.environ.get("XDG_RUNTIME_DIR", f"/run/user/{os.getuid()}"),
@@ -68,40 +65,19 @@ class Plugin(Base):
     preview_width = 320
     debounce = 700           # yt-dlp takes ~2 s: search when typing pauses
     keep_query = True
-    hints = [Hint("Enter", "play"), Hint("Shift+Enter", "other way"), Hint("Ctrl+Enter", "queue"), Hint("Ctrl+M", "music/video")]
+    hints = [Hint("Enter", "play"), Hint("Shift+Enter", "other way"), Hint("Ctrl+Enter", "queue")]
     empty_text = "Type to search YouTube"
+    tabs = [("music", "Music"), ("video", "Video")]   # Ctrl+H/L, Ctrl+1/2 (Vyom)
 
     def __init__(self, vyom, conf):
         super().__init__(vyom, conf)
-        self.mode = self.conf.get("mode", "music")
+        self.tab = self.conf.get("mode", "music")
         self.cache = {}
-        self.tabs = {}
-
-    def header_extra(self):
-        box = Gtk.Box(spacing=4)
-        group = None
-        for key, label in (("music", "Music"), ("video", "Video")):
-            b = Gtk.ToggleButton(label=label)
-            b.add_css_class("tab")
-            b.set_can_focus(False)
-            if group is None:
-                group = b
-            else:
-                b.set_group(group)
-            b.connect("toggled", lambda btn, k=key: btn.get_active() and self.set_mode(k))
-            self.tabs[key] = b
-            box.append(b)
-        self.tabs[self.mode].set_active(True)
-        return box
-
-    def set_mode(self, m):
-        self.mode = m
-        self.refresh()
 
     def opened(self, args):
         super().opened(args)
-        if args and args[0] in ("music", "video") and self.tabs:
-            self.tabs[args[0]].set_active(True)
+        if args and args[0] in ("music", "video"):
+            self.select_tab(args[0])
 
     def search(self, q):
         q = q.strip()
@@ -126,7 +102,7 @@ class Plugin(Base):
         if not res:
             return [Row("Nothing found", "or yt-dlp couldn't reach YouTube", icon="\U000f075a", color="gray",
                         data=None)]
-        rows = [Section("Play as music (MPD)" if self.mode == "music" else "Play as video (mpv)")]
+        rows = [Section("Play as music (MPD)" if self.tab == "music" else "Play as video (mpv)")]
         for d in res:
             rows.append(Row(d.get("title") or "?", " · ".join(x for x in (d.get("channel") or d.get("uploader"),
                                                                             views(d.get("view_count"))) if x),
@@ -143,8 +119,8 @@ class Plugin(Base):
             parts.append(ui.picture(d["_thumb"], 170))
         parts += [ui.title(d.get("title") or "?"), ui.meta(d.get("channel") or d.get("uploader") or ""),
                   ui.kv([("Length", duration(d.get("duration"))), ("Views", views(d.get("view_count")) or "-")]),
-                  ui.buttons([("Play music", lambda: self.play(d, "music"), "primary" if self.mode == "music" else ""),
-                              ("Watch video", lambda: self.play(d, "video"), "primary" if self.mode == "video" else "")])]
+                  ui.buttons([("Play music", lambda: self.play(d, "music"), "primary" if self.tab == "music" else ""),
+                              ("Watch video", lambda: self.play(d, "video"), "primary" if self.tab == "video" else "")])]
         return ui.vbox(*parts, spacing=10)
 
     # ------------------------------------------------------------ playing
@@ -200,14 +176,9 @@ class Plugin(Base):
     def activate(self, row, mods):
         if not row.data:
             return False
-        mode = self.mode
+        mode = self.tab
         if "shift" in mods:
             mode = "video" if mode == "music" else "music"
         self.play(row.data, mode, queue_only=("ctrl" in mods and mode == "music"))
         return False
 
-    def key(self, name, row, mods):
-        if "ctrl" in mods and name == "m":
-            self.tabs["video" if self.mode == "music" else "music"].set_active(True)
-            return True
-        return False
