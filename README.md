@@ -22,6 +22,10 @@
 
 <!-- No screenshot: music & video shows personal data (your own data). -->
 
+<p align="center">
+  <img alt="raga searching YouTube for lofi beats: results with thumbnails, channels, views and lengths, and the picked one's preview with Play music and Watch video" src="assets/screenshots/raga.png" width="100%">
+</p>
+
 > *Raga* (राग) is Sanskrit for "melody": the melody you were looking for.
 
 raga is youTube music and video for [Vyom](https://github.com/Theyashsawarkar/vyom): one keyboard-driven panel that opens instantly, with live data, a preview and a key for everything. It runs on any compositor with the layer-shell protocol (sway, Hyprland, river, niri, Wayfire, labwc…). In [Vayu](https://github.com/Theyashsawarkar/vayu), the desktop it was built for, it replaces music-search.py.

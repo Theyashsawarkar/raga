@@ -2,6 +2,10 @@
 
 Newest first. Releases are tags (`vX.Y.Z`).
 
+## Unreleased
+
+- Screenshots in the README and on the website.
+
 ## v0.2.1 -- 2026-10-24
 
 - A thumbnail that can't be fetched is logged (debug), not swallowed.
