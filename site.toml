@@ -6,3 +6,6 @@ tagline = "Search YouTube and play: music straight into MPD's queue (rmpc), or a
 color = "pink"
 kind = "a Vyom tool"
 logo = "assets/logo.svg"
+shloka = "नाहं वसामि वैकुण्ठे योगिनां हृदये न च ।\nमद्भक्ता यत्र गायन्ति तत्र तिष्ठामि नारद ॥"
+shloka_meaning = "I live not in Vaikuṇṭha, nor in the hearts of yogis; where those who love me sing, there I stay, Nārada."
+shloka_source = "Attributed to the Padma Purāṇa (Kārttika-māhātmya); quoted in Hari-bhakti-vilāsa 8.284"

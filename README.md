@@ -6,6 +6,15 @@
   </picture>
 </p>
 
+<!-- identity -->
+<p align="center">
+  <b>नाहं वसामि वैकुण्ठे योगिनां हृदये न च ।<br>
+  मद्भक्ता यत्र गायन्ति तत्र तिष्ठामि नारद ॥</b><br>
+  <i>I live not in Vaikuṇṭha, nor in the hearts of yogis; where those who love me sing, there I stay, Nārada.</i><br>
+  <sub>Attributed to the Padma Purāṇa (Kārttika-māhātmya); quoted in Hari-bhakti-vilāsa 8.284</sub>
+</p>
+<!-- /identity -->
+
 <p align="center">
   <b>Search YouTube and play: music straight into MPD's queue (rmpc), or a video in mpv. Thumbnails, durations, channels.</b><br>
   YouTube music and video. A tool for <a href="https://github.com/Theyashsawarkar/vyom">Vyom</a>, keyboard-driven panels for Wayland.
