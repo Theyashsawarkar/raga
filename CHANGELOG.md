@@ -2,11 +2,16 @@
 
 Newest first. Releases are tags (`vX.Y.Z`).
 
-## Unreleased
+## v0.3.0 -- 2026-11-09
 
+- **Vim keys** (Vyom 0.7, ADR 0008): NORMAL and INSERT modes, `Space` as the leader with a which-key strip, `?` and `Space ?` list every key, `Space Space` is a palette, counts (`5j`), `gg` / `G`, `H` / `L` for tabs. It opens in INSERT (search-first): type, then `Esc` for NORMAL. Needs Vyom 0.7.0.
+- Its keys are data (`raga/vim.py`); `scripts/keybinds.py` writes the `# keybind:` lines and the README's key tables from them, and `--check` (CI) fails when they drift.
+- `o` plays the other way (Shift+Enter still does), `y y` copies the link, `Space a q` queues, `Space o b` opens it on YouTube, `Space y t` copies the title, `Space r` searches again past what's remembered.
+- `Ctrl+Enter` queues the music on the Video tab too (it played the video, which wasn't documented).
 - Every corner is rounded: the website's callouts.
 - A logo and a shloka at the top of the README and the website: every Vayu tool has them now.
 - Screenshots in the README and on the website.
+- `o` and `Space a q` typed before the results arrive wait for them, so they never play or queue the previous search's song.
 
 ## v0.2.1 -- 2026-10-24
 

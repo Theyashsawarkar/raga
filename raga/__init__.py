@@ -17,9 +17,22 @@ import urllib.request
 from vyom import Hint, Row, Section, ui, util
 from vyom import Plugin as Base
 
-# keybind: Vyom/music | Enter | Play the selected result (music: in nāda, or MPD via rmpc; video: in mpv)
-# keybind: Vyom/music | Shift+Enter | Play it the other way (as video / as music)
-# keybind: Vyom/music | Ctrl+Enter | Add the music to the queue without playing it
+from . import vim
+
+# KEYBINDS (generated from raga/vim.py by scripts/keybinds.py; don't edit by hand)
+# keybind: Vyom/raga:insert | Enter | Play the selected result (music: in nāda, or MPD via rmpc; video: in mpv)
+# keybind: Vyom/raga:insert | Shift+Enter | Play it the other way (as video / as music)
+# keybind: Vyom/raga:insert | Ctrl+Enter | Add the music to the queue without playing it (on either tab)
+# keybind: Vyom/raga:normal | Enter | Play the selected result (music: in nāda, or MPD via rmpc; video: in mpv)
+# keybind: Vyom/raga:normal | o | Play it the other way (as video / as music)
+# keybind: Vyom/raga:normal | y y | Copy the selected result's YouTube link
+# keybind: Vyom/raga leader:normal | Space t m / Space t v | Switch to Music / Video
+# keybind: Vyom/raga leader:normal | Space a q | Add the music to the queue without playing it
+# keybind: Vyom/raga leader:normal | Space o b | Open the selected result on YouTube in the browser
+# keybind: Vyom/raga leader:normal | Space y y | Copy the selected result's YouTube link
+# keybind: Vyom/raga leader:normal | Space y t | Copy the selected result's title
+# keybind: Vyom/raga leader:normal | Space r | Search YouTube again (skips what's remembered for this search)
+# END KEYBINDS
 
 VIDEO_FORMAT = "bestvideo[height<=1080]+bestaudio/best[height<=1080]"
 os.environ.setdefault("MPD_HOST", os.path.join(os.environ.get("XDG_RUNTIME_DIR", f"/run/user/{os.getuid()}"),
@@ -69,9 +82,14 @@ class Plugin(Base):
     preview_width = 320
     debounce = 700           # yt-dlp takes ~2 s: search when typing pauses
     keep_query = True
-    hints = [Hint("Enter", "play"), Hint("Shift+Enter", "other way"), Hint("Ctrl+Enter", "queue")]
+    hints = [Hint("Enter", "play"), Hint("o", "other way"), Hint("Space a q", "queue"), Hint("y y", "copy link")]
+    insert_hints = [Hint("Enter", "play"), Hint("Shift+Enter", "other way"), Hint("Ctrl+Enter", "queue"),
+                    Hint("Esc", "normal mode")]
+    modal = True             # Vyom's vim keys (ADR 0008); raga/vim.py
+    start_mode = "insert"    # search-first
+    key_groups = vim.GROUPS
     empty_text = "Type to search YouTube"
-    tabs = [("music", "Music"), ("video", "Video")]   # Ctrl+H/L, Ctrl+1/2 (Vyom)
+    tabs = [("music", "Music"), ("video", "Video")]   # H / L, Space t m / t v (Vyom)
 
     def __init__(self, vyom, conf):
         super().__init__(vyom, conf)
@@ -180,9 +198,64 @@ class Plugin(Base):
     def activate(self, row, mods):
         if not row.data:
             return False
+        if "ctrl" in mods:          # the queue is music's, on either tab
+            self.play(row.data, "music", queue_only=True)
+            return False
         mode = self.tab
         if "shift" in mods:
             mode = "video" if mode == "music" else "music"
-        self.play(row.data, mode, queue_only=("ctrl" in mods and mode == "music"))
+        self.play(row.data, mode)
         return False
+
+    # ================================================================ keys
+    # The modes, counts and sequences are Vyom's; raga/vim.py is its keys.
+    def keys(self, tab):
+        return vim.keys(tab)
+
+    def chosen(self):
+        row = self.panel.selected_row() if self.panel else None
+        return row.data if row is not None and row.data else None
+
+    def waits(self, action, n):
+        """Typed before the results arrived (a search, Esc, o): it runs on
+        what they select, not on the row that was there a moment ago."""
+        modal = self.panel.modal if self.panel else None
+        if modal is not None and self.panel.searching:
+            modal.deferred.append((vim.B("<CR>", action), n))
+            return True
+        return False
+
+    def v_other(self, n, _a):
+        if self.waits("other", n):
+            return
+        row = self.panel.selected_row()
+        if row is not None and row.data:
+            self.activate(row, {"shift"})
+
+    def v_queue(self, n, _a):
+        if self.waits("queue", n):
+            return
+        row = self.panel.selected_row()
+        if row is not None and row.data:
+            self.activate(row, {"ctrl"})
+
+    def v_copy(self, _n, arg):
+        d = self.chosen()
+        if d is None:
+            return
+        text = (d.get("title") or "?") if arg == "title" else f"https://youtube.com/watch?v={d.get('id')}"
+        util.copy(text)
+        self.set_status(f"copied {text}", kind="ok")
+
+    def v_browser(self, _n, _a):
+        d = self.chosen()
+        if d is not None:
+            util.spawn(["xdg-open", f"https://youtube.com/watch?v={d.get('id')}"])
+            self.close()
+
+    def v_research(self, _n, _a):
+        q = self.panel.query().strip() if self.panel else ""
+        self.cache.pop(q, None)
+        self.refresh()
+        self.set_status("searching again…")
 
