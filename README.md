@@ -32,7 +32,7 @@
 <!-- No screenshot: music & video shows personal data (your own data). -->
 
 <p align="center">
-  <img alt="raga searching YouTube for lofi beats: results with thumbnails, channels, views and lengths, and the picked one's preview with Play music and Watch video" src="assets/screenshots/raga.png" width="100%">
+  <img alt="raga searching YouTube for lofi beats: results with thumbnails, channels, views and lengths, and the picked one's preview with Play music and Watch video" src="assets/screenshots/raga.webp" width="100%">
 </p>
 
 > *Raga* (राग) is Sanskrit for "melody": the melody you were looking for.
